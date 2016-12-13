@@ -11,7 +11,7 @@ public:
     virtual void work();
 
 private:
-    std::list<uint64_t> sentTimes, sentPacketNums;
+    std::list<uint64_t> sentTimes, sentPacketNums, recvTimes;
 };
 
 #endif /* LOSSDETECTOR_HH */

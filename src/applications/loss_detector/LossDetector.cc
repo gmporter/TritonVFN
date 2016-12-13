@@ -30,6 +30,7 @@ void LossDetector::work()
         uint64_t * ptr = (uint64_t *) (((uint8_t *) p.data)+42);
         sentTimes.push_back( *ptr );          // sent time
         sentPacketNums.push_back( *(ptr+1) ); // pkt number
+        recvTimes.push_back( Utils::utime() );
     }
     
     assert(sentTimes.size() == sentPacketNums.size());
@@ -39,7 +40,10 @@ void LossDetector::work()
         sentTimes.pop_front();
         uint64_t pktNum = sentPacketNums.front();
         sentPacketNums.pop_front();
+        uint64_t recvTime = recvTimes.front();
+        recvTimes.pop_front();
 
-        printf("pkt_num %jd sent_time %jd\n", pktNum, sentTime);
+        printf("pkt_num %jd sent_time %jd recv_time %jd\n",
+               pktNum, sentTime, recvTime);
     }
 }
