@@ -27,12 +27,11 @@ void PacketSender::work()
 
     for (uint64_t i = 0; i < numPacketsToGenerate; i++) {
         uint8_t * packet = new uint8_t[packetSize];
-        uint8_t srcmac[6], dstmac[6];
+        uint8_t srcmac[6] = {0x00, 0x60, 0xdd, 0x46, 0x82, 0x68};
+        uint8_t dstmac[6] = {0x00, 0x1B, 0x21, 0x9F, 0x8E, 0x7F};
         char srcip[128], dstip[128];
         uint16_t srcport, dstport;
 
-        srcmac = {0x00, 0x60, 0xdd, 0x46, 0x82, 0x68};
-        dstmac = {0x00, 0x1B, 0x21, 0x9F, 0x8E, 0x7F};
         /*
         memset(srcmac, 0, 6);
         memset(dstmac, 0, 6);
