@@ -85,7 +85,7 @@ void PacketSender::randomize(uint8_t * buf, uint64_t len) {
 }
 
 void PacketSender::randomIP(char * dstbuf, int buflen) {
-    snprintf(dstbuf, buflen, "%d.%d.%d.%d",
+    snprintf(dstbuf, buflen, "%ld.%ld.%ld.%ld",
              lrand48() % 256, lrand48() % 256,
              lrand48() % 256, lrand48() % 256);
 }
