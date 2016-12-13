@@ -4,4 +4,4 @@ link_directories("${TRITONVFN_BINARY_DIR}/core"
 
 add_executable(latency-meter main.cpp LatencyMeter.cc)
 
-target_link_libraries(latency-meter core snf gflags)
+target_link_libraries(latency-meter core snf gflags pthread)

@@ -4,4 +4,4 @@ link_directories("${TRITONVFN_BINARY_DIR}/core"
 
 add_executable(incomding-rate-meter main.cpp RateMeter.cc)
 
-target_link_libraries(incomding-rate-meter core snf gflags)
+target_link_libraries(incomding-rate-meter core snf gflags pthread)

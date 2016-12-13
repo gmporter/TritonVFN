@@ -4,4 +4,4 @@ link_directories("${TRITONVFN_BINARY_DIR}/core"
 
 add_executable(pkt-gen main.cpp PacketSender.cc)
 
-target_link_libraries(pkt-gen core snf gflags)
+target_link_libraries(pkt-gen core snf gflags pthread)
