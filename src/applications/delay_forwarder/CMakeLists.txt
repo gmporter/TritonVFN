@@ -4,4 +4,4 @@ link_directories("${TRITONVFN_BINARY_DIR}/core"
 
 add_executable(delay-forwarder main.cpp DelayForwarder.cc)
 
-target_link_libraries(delay-forwarder core snf gflags)
+target_link_libraries(delay-forwarder core snf gflags pthread)
