@@ -10,7 +10,7 @@ enable_testing(true)
 # TritonVFN (header file only library) 
 ###########################################################################
 
-set(CMAKE_CXX_FLAGS "-DNDEBUG")
+set(CMAKE_CXX_FLAGS "-DNDEBUG -std=c++11")
 
 include_directories(${TritonVFN_SOURCE_DIR})
 add_subdirectory(core)
