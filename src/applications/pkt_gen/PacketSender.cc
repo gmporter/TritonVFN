@@ -3,17 +3,31 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string>
 #include "core/myricom/MyricomSNFNetworkInterface.hh"
 #include "core/Utils.hh"
 #include "PacketSender.hh"
 
 PacketSender::PacketSender(MyricomSNFNetworkInterface * sendInterface,
-                           int coreToRunOn, uint64_t _numPacketsToGenerate,
+                           int coreToRunOn, std::string srcMACstr,
+                           uint64_t _numPacketsToGenerate,
                            uint64_t _packetSize)
     : NetBump(/* inInterface */ NULL, sendInterface, coreToRunOn),
       numPacketsToGenerate(_numPacketsToGenerate), packetSize(_packetSize)
 {
+    /* initialize the random number generator */
     srand48(Utils::utime());
+
+    /* set our source mac address */
+    int octets[6];
+    int numconverted;
+    numconverted = sscanf(srcMACstr.c_str(), "%x:%x:%x:%x:%x:%x",
+                   &octets[0], &octets[1], &octets[2],
+                   &octets[3], &octets[4], &octets[5]);
+    assert(numconverted == 6);
+    for (int i = 0; i < 6; i++) {
+        srcmac[i] = (uint8_t) octets[i];
+    }
 }
 
 PacketSender::~PacketSender()
@@ -27,26 +41,12 @@ void PacketSender::work()
 
     for (uint64_t i = 0; i < numPacketsToGenerate; i++) {
         uint8_t * packet = new uint8_t[packetSize];
-        uint8_t srcmac[6] = {0x00, 0x60, 0xdd, 0x46, 0x82, 0x68};
-        uint8_t dstmac[6] = {0x00, 0x1B, 0x21, 0x9F, 0x8E, 0x7F};
+        uint8_t dstmac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
         char srcip[128], dstip[128];
         uint16_t srcport, dstport;
 
-        /*
-        memset(srcmac, 0, 6);
-        memset(dstmac, 0, 6);
-        */
+        strncpy(dstip, "255.255.255.255", strlen("255.255.255.255")+1);
 
-        /*
-        strncpy(srcip, "192.168.4.72", strlen("192.168.4.72")+1);
-        */
-        strncpy(dstip, "192.168.5.72", strlen("192.168.5.72")+1);
-
-        /*
-        randomize(srcmac, 6);
-        randomize(dstmac, 6);
-        randomIP(dstip, 128);
-        */
         randomIP(srcip, 128);
         randomPort(&srcport);
         randomPort(&dstport);
@@ -72,7 +72,6 @@ void PacketSender::work()
         memcpy(packetdata+payloadOffset+sizeof(uint64_t), &i, sizeof(uint64_t));
 
         sendPacket(packets[i]);
-        //usleep(1);
     }
 
     delete [] packets;

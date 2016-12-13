@@ -15,6 +15,7 @@ DEFINE_uint64(boardNum, 0, "Myricom board number to generate packets from");
 DEFINE_uint64(numPackets, 1000, "Number of packets to generate");
 DEFINE_uint64(packetSizeInBytes, 64, "Packet size (in bytes)");
 DEFINE_uint64(workerCPU, 4, "CPU to run packet generator thread on");
+DEFINE_string(srcMACstr, "00:11:22:33:44:55", "Source MAC address");
 
 int 
 main(int argc, char *argv[]) {
@@ -25,6 +26,7 @@ main(int argc, char *argv[]) {
     new MyricomSNFNetworkInterface(FLAGS_boardNum);
 
   PacketSender * sender = new PacketSender(board, FLAGS_workerCPU,
+                                           FLAGS_srcMACstr,
                                            FLAGS_numPackets,
                                            FLAGS_packetSizeInBytes);
 
