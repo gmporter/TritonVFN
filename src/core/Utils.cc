@@ -11,6 +11,18 @@
 #include "Utils.hh"
 #include "gtest/gtest.h"
 
+// time in nanoseconds
+uint64_t Utils::ntime() {
+  struct timespec time;
+  if (clock_gettime(CLOCK_MONOTONIC, &time)) {
+    perror("clock_gettime");
+    exit(1);
+  }
+
+  return (((uint64_t) time.tv_sec) * 1000000000) + time.tv_nsec;
+}
+
+// time in microseconds
 uint64_t Utils::utime() {
   struct timeval time;
   gettimeofday(&time, NULL);
