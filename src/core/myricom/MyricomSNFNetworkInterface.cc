@@ -98,7 +98,7 @@ void MyricomSNFNetworkInterface::sendPacket(Packet & p)
     int rc;
 
     do {
-        rc = snf_inject_send(txring, /*timeout*/ 0,
+        rc = snf_inject_send(txring, /*timeout*/ 0, /*flags*/ 0,
                              (const void *)p.data, p.length);
     } while (rc == EAGAIN);
 }
