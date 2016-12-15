@@ -9,6 +9,7 @@ class Utils {
 public:
     static uint64_t ntime(); // time in nanoseconds
     static uint64_t utime(); // time in microseconds
+    static void ubusywait(uint64_t microseconds);
 
     static uint32_t createUDPPacket(uint8_t *buf, int payloadLength,
                                     const uint8_t * srcmac,

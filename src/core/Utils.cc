@@ -30,6 +30,11 @@ uint64_t Utils::utime() {
   return (((uint64_t) time.tv_sec) * 1000000) + time.tv_usec;
 }
 
+void Utils::ubusywait(uint64_t microseconds) {
+    uint64_t start = Utils::utime();
+    while (Utils::utime() - start < microseconds) { }
+}
+
 unsigned short Utils::cksum(unsigned short *ip, int len) {
     int32_t sum = 0;  /* assume 32 bit long, 16 bit short */
 
