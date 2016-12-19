@@ -3,6 +3,7 @@
 #endif
 
 #include <assert.h>
+#include <sched.h>
 #include <stdio.h>
 #include "core/NetBump.hh"
 #include "core/myricom/MyricomSNFNetworkInterface.hh"
@@ -60,9 +61,10 @@ void NetBump::getOutInterfaceStatistics(MyricomSNFNetworkInterfaceStats & stats)
 }
 
 void NetBump::startWorkThread()
-{   
+{
     int rc;
     pthread_attr_t attr;
+    sched_param param;
     cpu_set_t cpus;
 
     /* create thread attributes */
@@ -75,6 +77,15 @@ void NetBump::startWorkThread()
     rc = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
     assert(rc == 0);
 
+    /* Set priority */
+    rc = pthread_attr_getschedparam(&attr, &param);
+    assert(rc == 0);
+    param.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    rc = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+    assert(rc == 0);
+    rc = pthread_attr_setschedparam(&attr, &param);
+    assert(rc == 0);
+
     /* create the actual work thread */
     rc = pthread_create(&threadHandle, &attr, startThreadHelper, this);
     assert(rc == 0);
@@ -85,7 +96,7 @@ void NetBump::startWorkThread()
 }
 
 void NetBump::stopWorkThread()
-{   
+{
     int rc;
 
     shouldShutDown = true;

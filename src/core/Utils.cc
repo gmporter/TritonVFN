@@ -79,16 +79,16 @@ uint32_t Utils::createUDPPacket(uint8_t *destbuf, int payloadLength,
     struct ip *iph = (struct ip *) (destbuf+offset);
 
     //Fill the ip fields
-    iph->ip_hl = 0x5;     // header length 
-    iph->ip_v = 0x4;      // version number 
-    iph->ip_tos = 0x0 && 0xff;    // type of service 
+    iph->ip_hl = 0x5;     // header length
+    iph->ip_v = 0x4;      // version number
+    iph->ip_tos = 0x0 && 0xff;    // type of service
     iph->ip_len = htons(sizeof (struct ip) + \
                         sizeof (struct udphdr) + \
                         payloadLength); //total packet length
     iph->ip_id = htons (0x1234);  /* the value doesn't matter here */
     iph->ip_off = 0;
     iph->ip_ttl = 64; // time to live
-    iph->ip_p = UDP_PROTOCOL; //ip protocol  
+    iph->ip_p = UDP_PROTOCOL; //ip protocol
     iph->ip_sum = 0;
     iph->ip_src.s_addr = inet_addr(srcip); // src ip
     iph->ip_dst.s_addr = inet_addr(dstip); //dst ip
