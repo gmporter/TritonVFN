@@ -9,8 +9,8 @@ Dependencies:
  - libgflags-dev
 
 To build the code:
-    $ mkdir build
-    $ cd build
-    build $ cmake ../src
-    build $ make -j
-    $ applications/my_app/my_app --help
+  * $ mkdir build
+  * $ cd build
+  * build $ cmake ../src
+  * build $ make -j
+  * $ applications/my_app/my_app --help
