@@ -9,7 +9,7 @@
 
 #include <gflags/gflags.h>
 
-bool shouldStop = false;
+volatile bool shouldStop = false;
 
 void cntl_c_handler(int s){
     shouldStop = true;

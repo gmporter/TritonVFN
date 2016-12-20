@@ -19,7 +19,7 @@ DEFINE_uint64(boardNum, 0, "Myricom board number to generate packets from");
 DEFINE_uint64(expectedNumPackets, UINT64_MAX, "Number of packets to expect");
 DEFINE_uint64(workerCPU, 6, "CPU to run rate meter thread on");
 
-bool shouldStop = false;
+volatile bool shouldStop = false;
 
 void cntl_c_handler(int s){
     shouldStop = true;
