@@ -37,6 +37,7 @@ private:
 
     static const int PayloadOffset = 42;
 
+    std::vector<uint64_t> sentAcks;
     std::vector<uint64_t> ackdPings;
 };
 

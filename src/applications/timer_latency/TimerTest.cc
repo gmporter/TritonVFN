@@ -21,8 +21,11 @@ void TimerTest::work()
     total = 0;
     num_readings = 0;
     num_big = 0;
+    volatile int i;
     while (!shouldShutDown) {
         before = Utils::ntime();
+        i = 0;
+        while(i < 1000) { i++; }
         now = Utils::ntime();
         delta = now - before;
         if(delta > high)

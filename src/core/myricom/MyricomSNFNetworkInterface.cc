@@ -102,4 +102,3 @@ void MyricomSNFNetworkInterface::sendPacket(Packet & p)
                              (const void *)p.data, p.length);
     } while (rc == EAGAIN);
 }
-
