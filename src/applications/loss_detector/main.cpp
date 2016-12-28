@@ -31,7 +31,7 @@ main(int argc, char *argv[]) {
 
   signal (SIGINT, cntl_c_handler);
 
-  printf("listening on board %jd\n", FLAGS_boardNum);
+  fprintf(stderr ,"listening on board %jd\n", FLAGS_boardNum);
   MyricomSNFNetworkInterface * board = \
     new MyricomSNFNetworkInterface(FLAGS_boardNum);
 

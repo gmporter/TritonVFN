@@ -21,7 +21,7 @@ int
 main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  printf("Sending on board %jd\n", FLAGS_boardNum);
+  fprintf(stderr, "Sending on board %jd\n", FLAGS_boardNum);
   MyricomSNFNetworkInterface * board = \
     new MyricomSNFNetworkInterface(FLAGS_boardNum);
 
