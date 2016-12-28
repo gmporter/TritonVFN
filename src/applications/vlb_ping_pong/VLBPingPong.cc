@@ -29,7 +29,8 @@ VLBPingPong::VLBPingPong(MyricomSNFNetworkInterface * iface,
         srcmac[i] = (uint8_t) octets[i];
     }
 
-    ackdPings.reserve(_numAcksNeeded + 10);
+    sentAcks.reserve(_numAcksNeeded * 10);
+    ackdPings.reserve(_numAcksNeeded * 2);
 }
 
 VLBPingPong::~VLBPingPong()
@@ -67,8 +68,10 @@ void VLBPingPong::work()
         if (in_pkt.length > 0) {
             uint8_t * in_pkt_ptr = (uint8_t *) in_pkt.data;
 
-            if (shouldPong = hasPing(in_pkt_ptr))
+            if (shouldPong = hasPing(in_pkt_ptr)){
                 pongNum = getPingSeqNum(in_pkt_ptr);
+                sentAcks.push_back(pongNum);
+            }
 
             if (hasPong(in_pkt_ptr)) {
                 ackdPings.push_back(getPongAckNum(in_pkt_ptr));
@@ -91,8 +94,10 @@ void VLBPingPong::work()
         if (shouldPong = hasPing(in_pkt_ptr))
             pongNum = getPingSeqNum(in_pkt_ptr);
 
-        if (hasPong(in_pkt_ptr))
+        if (hasPong(in_pkt_ptr)){
             ackdPings.push_back(getPongAckNum(in_pkt_ptr));
+            sentAcks.push_back(pongNum);
+        }
 
         if(shouldPong){
             initPingPong((uint8_t *)ping_pong_pkt.data, false, 0, shouldPong, pongNum);
@@ -101,6 +106,12 @@ void VLBPingPong::work()
         recvPacket(in_pkt);
     }
 
+    printf("SENT ACKS:\n");
+    for(std::vector<uint64_t>::const_iterator i = sentAcks.begin(); i != sentAcks.end(); ++i) {
+        printf("%jd\n", *i);
+    }
+
+    printf("RECEIVED ACKS:\n");
     for(std::vector<uint64_t>::const_iterator i = ackdPings.begin(); i != ackdPings.end(); ++i) {
         printf("%jd\n", *i);
     }
