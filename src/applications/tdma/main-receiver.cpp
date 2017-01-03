@@ -15,6 +15,7 @@
 
 DEFINE_uint64(boardNum, 0, "Myricom board to use");
 DEFINE_uint64(workerCPU, 4, "CPU to run packet receiver thread on");
+DEFINE_uint64(burstSize, 200, "Packets to send during a given day");
 
 volatile bool shouldStop = false;
 

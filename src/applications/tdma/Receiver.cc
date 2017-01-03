@@ -9,12 +9,14 @@
 #include "core/Utils.hh"
 #include "Receiver.hh"
 
+void timespec_add_ns(struct timespec *t, unsigned long long ns);
+
 Receiver::Receiver(MyricomSNFNetworkInterface * rboard,
                    MyricomSNFNetworkInterface * sboard,
                    int coreToRunOn)
     : NetBump(rboard, sboard, coreToRunOn),
       lastseq(0), lasttime(0), insteadystate(false),
-      nextReply(0)
+      initializing(true), nextReply(0)
 {
     reply.data = new uint8_t[1500];
     memset(reply.data, 0, 1500);
@@ -26,36 +28,35 @@ Receiver::~Receiver()
 
 void Receiver::work()
 {
+    std::list<uint64_t> sleepTimes;
     uint64_t numpkts = 0;
     Packet p;
 
     while (!shouldShutDown) {
         recvPacket(p);
+
         if (p.length != 0) {
             numpkts++;
             incomingPacket(p);
         }
+
+        if (!initializing) {
+            while (!shouldShutDown) {
+                // send some data
+                for (int i = 0; i < 200; i++) {
+                    memcpy(reply.data, &nextReply, sizeof(uint64_t));
+                    nextReply++;
+                    sendPacket(reply);
+                }
+
+                timespec_add_ns(&daystarttimer, 1000000);
+                clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &daystarttimer, NULL);
+            }
+        }
     }
 
     fprintf(stderr, "Received: %jd packets\n", numpkts);
-
-#if 0
-    uint64_t basis = 0;
-    while (times.size() >= 2) {
-        uint64_t dayend = times.front();
-        times.pop_front();
-
-        uint64_t daystart = times.front();
-        times.pop_front();
-
-        if (basis == 0)  {
-            basis = dayend;
-        }
-
-        printf("day ended at %jd, started at %jd\n",
-            dayend - basis, daystart - basis);
-    }
-#endif
+    fprintf(stderr, "Sent: %jd packets\n", nextReply-1);
 }
 
 void Receiver::incomingPacket(Packet p)
@@ -81,19 +82,23 @@ void Receiver::incomingPacket(Packet p)
 
     } else {
         // out of order packet, in steady state
-#if 0
-        times.push_back(lasttime);
-        times.push_back(p.timestamp / 1000);
-#endif
-
         lastseq = seqNum;
         lasttime = (p.timestamp / 1000);
-
-        // send some data
-        for (int i = 0; i < 250; i++) {
-            memcpy(reply.data, &nextReply, sizeof(uint64_t));
-            nextReply++;
-            sendPacket(reply);
+        initializing = false;
+        if (clock_gettime(CLOCK_REALTIME, &daystarttimer)) {
+            perror("clock_gettime");
         }
     }
+}
+
+void timespec_add_ns(struct timespec *t, unsigned long long ns)
+{
+    int tmp = ns / 1000000000;
+    t->tv_sec += tmp;
+    ns -= tmp * 1000000000;
+    t->tv_nsec += ns;
+
+    tmp = t->tv_nsec / 1000000000;
+    t->tv_sec += tmp;
+    t->tv_nsec -= tmp * 1000000000;
 }

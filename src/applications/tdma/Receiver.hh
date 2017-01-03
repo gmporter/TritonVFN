@@ -19,12 +19,14 @@ protected:
     void incomingPacket(Packet p);
 
     uint64_t lastseq, lasttime;
-    bool insteadystate;
+    bool insteadystate, initializing;
 
     std::list<uint64_t> times;
 
     uint64_t nextReply;
     Packet reply;
+
+    struct timespec daystarttimer;
 };
 
 #endif /* RECEIVER_HH */

@@ -3,10 +3,11 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/prctl.h>
+#include <time.h>
+#include <list>
 #include "core/Utils.hh"
 #include "TimerTest.hh"
-
-#define BIG_DELTA 100000
 
 TimerTest::TimerTest(int coreToRunOn) : NetBump(NULL, NULL, coreToRunOn)
 { }
@@ -16,29 +17,36 @@ TimerTest::~TimerTest()
 
 void TimerTest::work()
 {
-    high = 0;
-    low = -1;
-    total = 0;
-    num_readings = 0;
-    num_big = 0;
-    volatile int i;
-    while (!shouldShutDown) {
-        before = Utils::ntime();
-        i = 0;
-        while(i < 1000) { i++; }
-        now = Utils::ntime();
-        delta = now - before;
-        if(delta > high)
-            high = delta;
-        if(delta < low);
-            low = delta;
-        if(delta >= BIG_DELTA){
-            printf("got big, %jd\n", delta);
-            num_big++;
-        }
-        total += delta;
-        num_readings++;
+    if (prctl(PR_SET_TIMERSLACK, 1, 0, 0, 0) == -1) {
+        fprintf(stderr, "set prctl()\n");
+        return;
     }
-    avg = total/(num_readings * 1.0);
-    printf("num_readings=%jd\tnum_big=%jd\thigh=%jd\tlow=%jd\tavg=%.2f\n", num_readings, num_big, high, low, avg);
+
+    int slackval = prctl(PR_GET_TIMERSLACK, 0, 0, 0, 0);
+    if (slackval == -1) {
+        fprintf(stderr, "get prctl()\n");
+        return;
+    }
+    fprintf(stderr, "Timer slack value is: %d nanoseconds\n", slackval);
+
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = 400000;
+
+    std::list<uint64_t> times;
+
+    for (int i = 0; i < 5000 && !shouldShutDown; i++) {
+        if (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, 0)) {
+            perror("clock_nanosleep");
+            break;
+        }
+        times.push_back(Utils::utime());
+    }
+
+    while (!times.empty()) {
+        uint64_t t = times.front();
+        times.pop_front();
+
+        printf("%jd\n", t);
+    }
 }

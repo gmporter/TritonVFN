@@ -11,8 +11,6 @@ public:
     virtual void work();
 
 private:
-    uint64_t before, now, delta, high, low, total, num_readings, num_big;
-    float avg;
 };
 
 #endif /* PPSCALC_HH */
